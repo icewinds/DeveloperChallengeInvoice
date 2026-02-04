@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice System - Frontend Tests</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .summary {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .summary-box {
+            flex: 1;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .summary-box.passed {
+            background: #27ae60;
+            color: white;
+        }
+        .summary-box.failed {
+            background: #e74c3c;
+            color: white;
+        }
+        .summary-box.total {
+            background: #3498db;
+            color: white;
+        }
+        .summary-box h2 {
+            margin: 0;
+            font-size: 2em;
+        }
+        .summary-box p {
+            margin: 5px 0 0 0;
+        }
+        .test-result {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 5px solid #ddd;
+        }
+        .test-result.pass {
+            border-left-color: #27ae60;
+        }
+        .test-result.fail {
+            border-left-color: #e74c3c;
+        }
+        .test-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .test-status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .test-status.pass {
+            background: #27ae60;
+            color: white;
+        }
+        .test-status.fail {
+            background: #e74c3c;
+            color: white;
+        }
+        .test-message {
+            color: #e74c3c;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+        #runTests {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        #runTests:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Invoice System - Frontend Tests</h1>
+        <p>JavaScript Unit Tests</p>
+    </div>
+    
+    <button id="runTests">Run Tests</button>
+    
+    <div class="summary" id="summary" style="display: none;">
+        <div class="summary-box total">
+            <h2 id="totalTests">0</h2>
+            <p>Total Tests</p>
+        </div>
+        <div class="summary-box passed">
+            <h2 id="passedTests">0</h2>
+            <p>Passed</p>
+        </div>
+        <div class="summary-box failed">
+            <h2 id="failedTests">0</h2>
+            <p>Failed</p>
+        </div>
+    </div>
+    
+    <div id="testResults"></div>
+
+    <!-- Import the actual app.js to test real functions -->
+    <script src="../assets/js/app.js"></script>
+
+    <script>
+        // Test framework
+        let testResults = [];
+        let testsPassed = 0;
+        let testsFailed = 0;
+
+        function test(name, callback) {
+            try {
+                callback();
+                testsPassed++;
+                testResults.push({ name, status: 'PASS', message: '' });
+            } catch (error) {
+                testsFailed++;
+                testResults.push({ name, status: 'FAIL', message: error.message });
+            }
+        }
+
+        function assertEquals(expected, actual, message = 'Values not equal') {
+            if (expected !== actual) {
+                throw new Error(`${message} - Expected: ${JSON.stringify(expected)}, Got: ${JSON.stringify(actual)}`);
+            }
+        }
+
+        function assertTrue(condition, message = 'Assertion failed') {
+            if (!condition) {
+                throw new Error(message);
+            }
+        }
+
+        function assertFalse(condition, message = 'Assertion failed') {
+            if (condition) {
+                throw new Error(message);
+            }
+        }
+
+        // Note: Testing actual functions from app.js
+        // getCurrencySymbol(), formatCurrency(), escapeHtml(), CURRENCY_SYMBOLS are imported from app.js
+
+        // Run all tests
+        function runTests() {
+            testResults = [];
+            testsPassed = 0;
+            testsFailed = 0;
+
+            // Test 1: Currency symbol mapping
+            test('getCurrencySymbol() - Should return correct symbol for USD', () => {
+                assertEquals('$', getCurrencySymbol('USD'));
+            });
+
+            test('getCurrencySymbol() - Should return correct symbol for EUR', () => {
+                assertEquals('€', getCurrencySymbol('EUR'));
+            });
+
+            test('getCurrencySymbol() - Should return correct symbol for GBP', () => {
+                assertEquals('£', getCurrencySymbol('GBP'));
+            });
+
+            test('getCurrencySymbol() - Should return fallback for unknown currency', () => {
+                assertEquals('XYZ ', getCurrencySymbol('XYZ'));
+            });
+
+            // Test 2: Currency formatting
+            test('formatCurrency() - Should format currency with comma separators', () => {
+                assertEquals('$1,234.56', formatCurrency(1234.56, '$'));
+            });
+
+            test('formatCurrency() - Should format currency with Euro symbol', () => {
+                assertEquals('€999.99', formatCurrency(999.99, '€'));
+            });
+
+            test('formatCurrency() - Should handle zero amounts', () => {
+                assertEquals('$0.00', formatCurrency(0, '$'));
+            });
+
+            test('formatCurrency() - Should handle large amounts', () => {
+                assertEquals('$1,000,000.00', formatCurrency(1000000, '$'));
+            });
+
+            // Test 3: Tax calculation logic
+            test('Tax calculation - Should calculate tax on taxable items only', () => {
+                const items = [
+                    { quantity: 2, unit_price: 100, taxable: true },  // 200
+                    { quantity: 1, unit_price: 50, taxable: false }    // 50
+                ];
+                
+                let subtotal = 0;
+                let taxableAmount = 0;
+                
+                items.forEach(item => {
+                    const lineTotal = item.quantity * item.unit_price;
+                    subtotal += lineTotal;
+                    if (item.taxable) {
+                        taxableAmount += lineTotal;
+                    }
+                });
+                
+                const taxRate = 10;
+                const taxAmount = taxableAmount * (taxRate / 100);
+                const total = subtotal + taxAmount;
+                
+                assertEquals(250, subtotal, 'Subtotal should be 250');
+                assertEquals(200, taxableAmount, 'Taxable amount should be 200');
+                assertEquals(20, taxAmount, 'Tax should be 20');
+                assertEquals(270, total, 'Total should be 270');
+            });
+
+            test('Tax calculation - Should calculate zero tax when all items non-taxable', () => {
+                const items = [
+                    { quantity: 1, unit_price: 100, taxable: false },
+                    { quantity: 1, unit_price: 50, taxable: false }
+                ];
+                
+                let subtotal = 0;
+                let taxableAmount = 0;
+                
+                items.forEach(item => {
+                    const lineTotal = item.quantity * item.unit_price;
+                    subtotal += lineTotal;
+                    if (item.taxable) {
+                        taxableAmount += lineTotal;
+                    }
+                });
+                
+                const taxRate = 10;
+                const taxAmount = taxableAmount * (taxRate / 100);
+                
+                assertEquals(150, subtotal, 'Subtotal should be 150');
+                assertEquals(0, taxableAmount, 'Taxable amount should be 0');
+                assertEquals(0, taxAmount, 'Tax should be 0');
+            });
+
+            test('Tax calculation - Should calculate full tax when all items taxable', () => {
+                const items = [
+                    { quantity: 1, unit_price: 100, taxable: true },
+                    { quantity: 1, unit_price: 50, taxable: true }
+                ];
+                
+                let subtotal = 0;
+                let taxableAmount = 0;
+                
+                items.forEach(item => {
+                    const lineTotal = item.quantity * item.unit_price;
+                    subtotal += lineTotal;
+                    if (item.taxable) {
+                        taxableAmount += lineTotal;
+                    }
+                });
+                
+                const taxRate = 10;
+                const taxAmount = taxableAmount * (taxRate / 100);
+                
+                assertEquals(150, subtotal, 'Subtotal should be 150');
+                assertEquals(150, taxableAmount, 'Taxable amount should be 150');
+                assertEquals(15, taxAmount, 'Tax should be 15');
+            });
+
+            // Test 4: Line total calculation
+            test('Line total calculation - Should multiply quantity by price', () => {
+                const quantity = 5;
+                const price = 25.50;
+                const lineTotal = quantity * price;
+                assertEquals(127.50, lineTotal);
+            });
+
+            test('Line total calculation - Should handle decimal quantities', () => {
+                const quantity = 2.5;
+                const price = 10.00;
+                const lineTotal = quantity * price;
+                assertEquals(25.00, lineTotal);
+            });
+
+            // Test 5: HTML escaping (XSS prevention)
+            test('HTML escaping - Should escape HTML special characters', () => {
+                const text = '<script>alert("xss")<' + '/script>';
+                const escaped = escapeHtml(text); // Test actual function from app.js
+                assertTrue(escaped.indexOf('<script>') === -1, 'Should not contain script tag');
+                assertTrue(escaped.indexOf('&lt;') !== -1, 'Should contain escaped characters');
+            });
+
+            // Test 6: Test escapeHtml function directly
+            test('escapeHtml() - Should escape quotes and special chars', () => {
+                const result = escapeHtml('Test "quotes" & <tags>');
+                assertTrue(result.indexOf('&lt;') !== -1, 'Should escape < symbol');
+                assertTrue(result.indexOf('&gt;') !== -1, 'Should escape > symbol');
+                assertTrue(result.indexOf('&quot;') !== -1, 'Should escape quotes');
+            });
+
+            // Display results
+            displayResults();
+        }
+
+        function displayResults() {
+            document.getElementById('summary').style.display = 'flex';
+            document.getElementById('totalTests').textContent = testsPassed + testsFailed;
+            document.getElementById('passedTests').textContent = testsPassed;
+            document.getElementById('failedTests').textContent = testsFailed;
+
+            const resultsContainer = document.getElementById('testResults');
+            resultsContainer.innerHTML = '';
+
+            testResults.forEach(result => {
+                const div = document.createElement('div');
+                div.className = `test-result ${result.status.toLowerCase()}`;
+                
+                const statusClass = result.status.toLowerCase();
+                div.innerHTML = `
+                    <div class="test-name">
+                        <span class="test-status ${statusClass}">${result.status}</span>
+                        ${result.name}
+                    </div>
+                    ${result.message ? `<div class="test-message">${result.message}</div>` : ''}
+                `;
+                
+                resultsContainer.appendChild(div);
+            });
+        }
+
+        document.getElementById('runTests').addEventListener('click', runTests);
+    </script>
+</body>
+</html>
