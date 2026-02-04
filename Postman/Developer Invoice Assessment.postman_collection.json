@@ -1,0 +1,71 @@
+{
+  "info": {
+    "_postman_id": "8fe280c1-8aa6-43a5-bfe7-34d3ec701b11",
+    "name": "Developer Invoice Assessment",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "17440732",
+    "_collection_link": "https://go.postman.co/collection/17440732-8fe280c1-8aa6-43a5-bfe7-34d3ec701b11?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Get Customers",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/DeveloperChallengeInvoice/api/customers.php",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "DeveloperChallengeInvoice",
+            "api",
+            "customers.php"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Products",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/DeveloperChallengeInvoice/api/products.php",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "DeveloperChallengeInvoice",
+            "api",
+            "products.php"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Invoice Details",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/DeveloperChallengeInvoice/api/products.php",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "DeveloperChallengeInvoice",
+            "api",
+            "products.php"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
